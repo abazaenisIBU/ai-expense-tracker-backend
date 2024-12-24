@@ -1,4 +1,4 @@
-package com.example.aiexpensetracker.core.repository;
+package com.example.aiexpensetracker.core.repository.contracts;
 
 import com.example.aiexpensetracker.core.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
