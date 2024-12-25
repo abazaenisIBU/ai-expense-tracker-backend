@@ -1,15 +1,16 @@
 package com.example.aiexpensetracker.core.service.contracts;
 
-import com.example.aiexpensetracker.core.model.Category;
+import com.example.aiexpensetracker.rest.dto.category.CategoryResponseDTO;
+import com.example.aiexpensetracker.rest.dto.category.CreateCategoryDTO;
+import com.example.aiexpensetracker.rest.dto.category.UpdateCategoryDTO;
 
 import java.util.List;
 
 public interface ICategoryService {
-    List<Category> getAllCategoriesByUser(String userEmail);
+    List<CategoryResponseDTO> getAllCategoriesByUser(String userEmail);
+    CategoryResponseDTO createCategory(CreateCategoryDTO dto, String userEmail);
 
-    Category createCategory(Category category, String userEmail);
-
-    Category updateCategory(Long id, Category categoryDetails);
-
-    void deleteCategory(Long id);
+    CategoryResponseDTO updateCategory(String email, Long categoryId, UpdateCategoryDTO dto);
+    void deleteCategory(String email, Long categoryId);
 }
+

@@ -1,15 +1,21 @@
 package com.example.aiexpensetracker.core.service.contracts;
 
 import com.example.aiexpensetracker.core.model.User;
+import com.example.aiexpensetracker.rest.dto.user.CreateUserDTO;
+import com.example.aiexpensetracker.rest.dto.user.UpdateProfilePictureDTO;
+import com.example.aiexpensetracker.rest.dto.user.UpdateUserDTO;
+import com.example.aiexpensetracker.rest.dto.user.UserResponseDTO;
 
 import java.util.Optional;
 
 public interface IUserService {
-    User createUser(User user);
+    UserResponseDTO createUser(CreateUserDTO createUserDTO);
 
-    Optional<User> getUserByEmail(String email);
+    Optional<UserResponseDTO> getUserByEmail(String email);
 
-    User updateUser(Long id, User userDetails);
+    UserResponseDTO updateUser(Long id, UpdateUserDTO updateUserDTO);
+
+    void updateProfilePicture(Long id, UpdateProfilePictureDTO updateProfilePictureDTO);
 
     void deleteUser(Long id);
 }

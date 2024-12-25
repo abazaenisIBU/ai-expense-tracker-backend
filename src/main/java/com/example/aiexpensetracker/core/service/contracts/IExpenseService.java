@@ -1,18 +1,21 @@
 package com.example.aiexpensetracker.core.service.contracts;
 
-import com.example.aiexpensetracker.core.model.Expense;
+import com.example.aiexpensetracker.rest.dto.expense.CreateExpenseDTO;
+import com.example.aiexpensetracker.rest.dto.expense.ExpenseResponseDTO;
+import com.example.aiexpensetracker.rest.dto.expense.UpdateExpenseDTO;
 
 import java.time.LocalDate;
 import java.util.List;
 
 public interface IExpenseService {
-    List<Expense> getAllExpensesByUser(String userEmail);
+    List<ExpenseResponseDTO> getAllExpensesByUser(String userEmail, String sortBy, String direction);
 
-    Expense createExpense(Expense expense, String userEmail);
+    ExpenseResponseDTO createExpense(CreateExpenseDTO dto, String userEmail);
 
-    Expense updateExpense(Long id, Expense expenseDetails);
+    ExpenseResponseDTO updateExpense(String userEmail, Long expenseId, UpdateExpenseDTO dto);
 
-    void deleteExpense(Long id);
+    void deleteExpense(String userEmail, Long expenseId);
 
-    List<Expense> getExpensesByDateRange(String userEmail, LocalDate startDate, LocalDate endDate);
+    List<ExpenseResponseDTO> getExpensesByDateRange(String userEmail, LocalDate startDate, LocalDate endDate);
+
 }

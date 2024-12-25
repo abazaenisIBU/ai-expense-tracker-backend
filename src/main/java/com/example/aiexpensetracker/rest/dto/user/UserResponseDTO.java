@@ -1,38 +1,15 @@
-package com.example.aiexpensetracker.core.model;
-
-import com.example.aiexpensetracker.rest.dto.user.UserResponseDTO;
-import jakarta.persistence.*;
+package com.example.aiexpensetracker.rest.dto.user;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 
-@Entity
-@Table(name = "users", uniqueConstraints = {
-        @UniqueConstraint(columnNames = "email")
-})
-public class User {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class UserResponseDTO {
     private Long id;
-
-    @Column(nullable = false, unique = true)
     private String email;
-
-    @Column(name = "first_name", nullable = false)
     private String firstName;
-
-    @Column(name = "last_name", nullable = false)
     private String lastName;
-
-    @Column(name = "profile_picture")
-    private String profilePicture;
-
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
-
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt = LocalDateTime.now();
+    private String profilePicture; // Now stores the name or URL of the profile picture
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
     // Getters and Setters
     public Long getId() {
