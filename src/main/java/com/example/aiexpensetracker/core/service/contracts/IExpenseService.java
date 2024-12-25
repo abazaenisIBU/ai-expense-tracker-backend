@@ -1,8 +1,7 @@
 package com.example.aiexpensetracker.core.service.contracts;
 
-import com.example.aiexpensetracker.rest.dto.expense.CreateExpenseDTO;
-import com.example.aiexpensetracker.rest.dto.expense.ExpenseResponseDTO;
-import com.example.aiexpensetracker.rest.dto.expense.UpdateExpenseDTO;
+import com.example.aiexpensetracker.rest.dto.expense.*;
+import com.example.aiexpensetracker.rest.dto.statistics.StatisticsResponseDTO;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -18,4 +17,5 @@ public interface IExpenseService {
 
     List<ExpenseResponseDTO> getExpensesByDateRange(String userEmail, LocalDate startDate, LocalDate endDate);
 
+    StatisticsResponseDTO getStatisticsForUser(String email);
 }

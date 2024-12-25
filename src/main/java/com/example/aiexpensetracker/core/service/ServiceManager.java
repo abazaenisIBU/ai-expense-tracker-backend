@@ -8,11 +8,13 @@ public class ServiceManager implements IServiceManager {
     private final UserService userService;
     private final ExpenseService expenseService;
     private final CategoryService categoryService;
+    private final ReportService reportService;
 
-    public ServiceManager(UserService userService, ExpenseService expenseService, CategoryService categoryService) {
+    public ServiceManager(UserService userService, ExpenseService expenseService, CategoryService categoryService, ReportService reportService) {
         this.userService = userService;
         this.expenseService = expenseService;
         this.categoryService = categoryService;
+        this.reportService = reportService;
     }
 
     public UserService getUserService() {
@@ -25,5 +27,9 @@ public class ServiceManager implements IServiceManager {
 
     public CategoryService getCategoryService() {
         return categoryService;
+    }
+
+    public ReportService getReportService() {
+        return reportService;
     }
 }

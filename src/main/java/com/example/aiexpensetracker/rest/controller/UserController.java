@@ -36,7 +36,6 @@ public class UserController {
             try {
                 UserResponseDTO created = serviceManager.getUserService().createUser(createUserDTO);
 
-                // Build the success response (JSON body)
                 ApiResponse<UserResponseDTO> successResponse = new ApiResponse<>(
                         LocalDateTime.now(),
                         HttpStatus.CREATED.value(),

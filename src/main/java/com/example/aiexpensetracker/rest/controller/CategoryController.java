@@ -1,5 +1,6 @@
 package com.example.aiexpensetracker.rest.controller;
 
+import com.example.aiexpensetracker.core.api.aiservice.AIService;
 import com.example.aiexpensetracker.core.service.ServiceManager;
 import com.example.aiexpensetracker.rest.dto.category.CategoryResponseDTO;
 import com.example.aiexpensetracker.rest.dto.category.CreateCategoryDTO;
@@ -15,15 +16,18 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/categories")
 public class CategoryController {
 
     private final ServiceManager serviceManager;
+    private final AIService aiService;
 
-    public CategoryController(ServiceManager serviceManager) {
+    public CategoryController(ServiceManager serviceManager, AIService aiService) {
         this.serviceManager = serviceManager;
+        this.aiService = aiService;
     }
 
     @GetMapping("/user/{email}")
@@ -55,6 +59,23 @@ public class CategoryController {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
             }
         });
+    }
+
+    @PostMapping("/suggest-category")
+    public ResponseEntity<String> suggestCategory(
+            @RequestParam String description,
+            @RequestParam String userEmail
+    ) {
+        // Fetch existing categories for the user
+        List<String> existingCategories = serviceManager.getCategoryService().getAllCategoriesByUser(userEmail)
+                .stream()
+                .map(CategoryResponseDTO::getName) // Assuming CategoryResponseDTO has a getName() method
+                .collect(Collectors.toList());
+
+        // Get the suggested category
+        String category = aiService.suggestCategory(description, existingCategories);
+
+        return ResponseEntity.ok(category);
     }
 
     @PostMapping("/user/{email}")

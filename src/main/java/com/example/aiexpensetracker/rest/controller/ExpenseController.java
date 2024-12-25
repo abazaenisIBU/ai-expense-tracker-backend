@@ -1,9 +1,7 @@
 package com.example.aiexpensetracker.rest.controller;
 
 import com.example.aiexpensetracker.core.service.ServiceManager;
-import com.example.aiexpensetracker.rest.dto.expense.CreateExpenseDTO;
-import com.example.aiexpensetracker.rest.dto.expense.ExpenseResponseDTO;
-import com.example.aiexpensetracker.rest.dto.expense.UpdateExpenseDTO;
+import com.example.aiexpensetracker.rest.dto.expense.*;
 import com.example.aiexpensetracker.rest.dto.shared.ApiResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
