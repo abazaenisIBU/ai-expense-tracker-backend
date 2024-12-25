@@ -1,27 +1,38 @@
 package com.example.aiexpensetracker.rest.controller;
 
+import com.example.aiexpensetracker.core.api.aiservice.AIService;
 import com.example.aiexpensetracker.core.service.ServiceManager;
+import com.example.aiexpensetracker.rest.dto.category.CategoryResponseDTO;
 import com.example.aiexpensetracker.rest.dto.expense.*;
 import com.example.aiexpensetracker.rest.dto.shared.ApiResponse;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/expenses")
 public class ExpenseController {
 
     private final ServiceManager serviceManager;
+    private final AIService aiService;
 
-    public ExpenseController(ServiceManager serviceManager) {
+    public ExpenseController(ServiceManager serviceManager, AIService aiService) {
         this.serviceManager = serviceManager;
+        this.aiService = aiService;
     }
 
     @GetMapping("/user/{email}")

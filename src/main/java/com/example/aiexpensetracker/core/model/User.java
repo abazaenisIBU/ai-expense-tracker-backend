@@ -1,10 +1,7 @@
 package com.example.aiexpensetracker.core.model;
 
-import com.example.aiexpensetracker.rest.dto.user.UserResponseDTO;
 import jakarta.persistence.*;
-
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 @Entity
 @Table(name = "users", uniqueConstraints = {
@@ -34,7 +31,6 @@ public class User {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt = LocalDateTime.now();
 
-    // Getters and Setters
     public Long getId() {
         return id;
     }

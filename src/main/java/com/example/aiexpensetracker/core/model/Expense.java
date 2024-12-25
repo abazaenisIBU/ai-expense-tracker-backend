@@ -28,10 +28,6 @@ public class Expense {
     @Column(name = "description")
     private String description;
 
-    @Lob
-    @Column(name = "receipt_image")
-    private byte[] receiptImage;
-
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
@@ -88,14 +84,6 @@ public class Expense {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public byte[] getReceiptImage() {
-        return receiptImage;
-    }
-
-    public void setReceiptImage(byte[] receiptImage) {
-        this.receiptImage = receiptImage;
     }
 
     public LocalDateTime getCreatedAt() {

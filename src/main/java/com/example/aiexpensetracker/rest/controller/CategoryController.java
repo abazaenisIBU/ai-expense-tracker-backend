@@ -2,9 +2,7 @@ package com.example.aiexpensetracker.rest.controller;
 
 import com.example.aiexpensetracker.core.api.aiservice.AIService;
 import com.example.aiexpensetracker.core.service.ServiceManager;
-import com.example.aiexpensetracker.rest.dto.category.CategoryResponseDTO;
-import com.example.aiexpensetracker.rest.dto.category.CreateCategoryDTO;
-import com.example.aiexpensetracker.rest.dto.category.UpdateCategoryDTO;
+import com.example.aiexpensetracker.rest.dto.category.*;
 import com.example.aiexpensetracker.rest.dto.shared.ApiResponse;
 import jakarta.validation.Valid;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -15,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -61,22 +60,70 @@ public class CategoryController {
         });
     }
 
-    @PostMapping("/suggest-category")
-    public ResponseEntity<String> suggestCategory(
+    @PostMapping("/suggest-category/{email}")
+    public CompletableFuture<ResponseEntity<ApiResponse<CategorySuggestionResponseDTO>>> suggestCategory(
             @RequestParam String description,
-            @RequestParam String userEmail
+            @PathVariable String email
     ) {
-        // Fetch existing categories for the user
-        List<String> existingCategories = serviceManager.getCategoryService().getAllCategoriesByUser(userEmail)
-                .stream()
-                .map(CategoryResponseDTO::getName) // Assuming CategoryResponseDTO has a getName() method
-                .collect(Collectors.toList());
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                // Fetch existing categories for the user
+                List<String> existingCategories = serviceManager.getCategoryService()
+                        .getAllCategoriesByUser(email)
+                        .stream()
+                        .map(CategoryResponseDTO::getName)
+                        .collect(Collectors.toList());
 
-        // Get the suggested category
-        String category = aiService.suggestCategory(description, existingCategories);
+                if (existingCategories.isEmpty()) {
+                    throw new RuntimeException("User not found or no categories available for the user");
+                }
 
-        return ResponseEntity.ok(category);
+                // Get the suggested category
+                Map<String, Object> aiResponse = aiService.suggestCategory(description, existingCategories);
+
+                // Extract values from the AI response
+                Integer status = (Integer) aiResponse.get("status");
+                String categoryName = (String) aiResponse.get("categoryName");
+                Boolean isNew = (Boolean) aiResponse.get("isNew");
+
+                // Prepare the main response DTO
+                CategorySuggestionResponseDTO responseDTO = new CategorySuggestionResponseDTO(
+                        categoryName,
+                        isNew
+                );
+
+                if (status == null || status == 400) {
+                    // Invalid description or unable to process
+                    ApiResponse<CategorySuggestionResponseDTO> errorResponse = new ApiResponse<>(
+                            LocalDateTime.now(),
+                            HttpStatus.BAD_REQUEST.value(),
+                            "Invalid description or unable to process the category suggestion.",
+                            responseDTO
+                    );
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+                }
+
+                // Success
+                ApiResponse<CategorySuggestionResponseDTO> successResponse = new ApiResponse<>(
+                        LocalDateTime.now(),
+                        HttpStatus.OK.value(),
+                        "Category suggestion successful",
+                        responseDTO
+                );
+                return ResponseEntity.ok(successResponse);
+
+            } catch (RuntimeException e) {
+                ApiResponse<CategorySuggestionResponseDTO> error = new ApiResponse<>(
+                        LocalDateTime.now(),
+                        HttpStatus.NOT_FOUND.value(),
+                        e.getMessage(),
+                        null
+                );
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+            }
+        });
     }
+
 
     @PostMapping("/user/{email}")
     public CompletableFuture<ResponseEntity<ApiResponse<CategoryResponseDTO>>> createCategory(

@@ -25,10 +25,8 @@ public class Category {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt = LocalDateTime.now();
 
-    // Default Constructor
     public Category() {}
 
-    // Getters and Setters
     public Long getId() {
         return id;
     }

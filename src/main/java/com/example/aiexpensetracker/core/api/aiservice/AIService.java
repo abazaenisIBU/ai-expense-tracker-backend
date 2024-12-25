@@ -1,10 +1,9 @@
 package com.example.aiexpensetracker.core.api.aiservice;
 
 import java.util.List;
+import java.util.Map;
 
 public interface AIService {
 
-    String suggestCategory(String description, List<String> existingCategories);
-
-//    Map<String, String> parseReceipt(byte[] imageBytes);
+    Map<String, Object> suggestCategory(String description, List<String> existingCategories);
 }

@@ -8,7 +8,6 @@ import com.sendgrid.Response;
 import com.sendgrid.SendGrid;
 import com.sendgrid.helpers.mail.Mail;
 import com.sendgrid.helpers.mail.objects.Content;
-import jakarta.validation.constraints.Email;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -28,7 +27,6 @@ public class SendGridSender implements MailSender {
         for (UserReportResponseDTO report : reports) {
             String emailContent = generateEmailContent(report);
 
-            // Use the `com.sendgrid.helpers.mail.objects.Email` class
             com.sendgrid.helpers.mail.objects.Email fromEmail = new com.sendgrid.helpers.mail.objects.Email("enis.abaza@stu.ibu.edu.ba");
             com.sendgrid.helpers.mail.objects.Email toEmail = new com.sendgrid.helpers.mail.objects.Email(report.getUserEmail());
             Content content = new Content("text/html", emailContent);
