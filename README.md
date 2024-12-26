@@ -39,7 +39,7 @@
 
 ## Technologies Used
 
-- **Language:** Java 17
+- **Language:** Java 
 - **Framework:** Spring Boot
 - **Database:** PostgreSQL
 - **API:** OpenAI for AI categorization
@@ -54,7 +54,7 @@
 
 1. **Clone the repository:**
    ```bash
-   git clone <your-repo-url>
+   git clone https://github.com/abazaenisIBU/ai-expense-tracker.git
    cd ai-expense-tracker
    ```
 
