@@ -1,29 +1,24 @@
 package com.example.aiexpensetracker.rest.controller;
 
-import com.example.aiexpensetracker.core.service.ServiceManager;
-import com.example.aiexpensetracker.core.service.contracts.IExpenseService;
+import com.example.aiexpensetracker.core.service.manager.IServiceManager;
+import com.example.aiexpensetracker.core.service.manager.ServiceManager;
 import com.example.aiexpensetracker.rest.dto.statistics.StatisticsResponseDTO;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.util.concurrent.CompletableFuture;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/statistics")
 public class StatisticsController {
 
-    private final ServiceManager serviceManager;
+    private final IServiceManager serviceManager;
 
-    public StatisticsController(ServiceManager serviceManager) {
+    public StatisticsController(IServiceManager serviceManager) {
         this.serviceManager = serviceManager;
     }
 
-    @GetMapping("/api/statistics")
-    public ResponseEntity<StatisticsResponseDTO> getStatistics(@RequestParam("email") String email) {
-        StatisticsResponseDTO statistics = serviceManager.getExpenseService().getStatisticsForUser(email);
+    @GetMapping("/user/{email}")
+    public ResponseEntity<StatisticsResponseDTO> getStatistics(@PathVariable("email") String email) {
+        StatisticsResponseDTO statistics = serviceManager.getStatisticsService().getStatisticsForUser(email);
         return ResponseEntity.ok(statistics);
     }
 }

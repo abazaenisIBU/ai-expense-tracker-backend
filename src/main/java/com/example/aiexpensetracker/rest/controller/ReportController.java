@@ -1,7 +1,7 @@
 package com.example.aiexpensetracker.rest.controller;
 
 import com.example.aiexpensetracker.core.api.mailsender.MailSender;
-import com.example.aiexpensetracker.core.service.ServiceManager;
+import com.example.aiexpensetracker.core.service.manager.IServiceManager;
 import com.example.aiexpensetracker.rest.dto.report.UserReportResponseDTO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -19,62 +19,52 @@ import java.util.List;
 @RequestMapping("/api/reports")
 public class ReportController {
 
-    private final ServiceManager serviceManager;
+    private final IServiceManager serviceManager;
     private final MailSender mailSender;
 
     @Value("${api.key}")
     private String apiKey;
 
-    public ReportController(ServiceManager serviceManager, MailSender mailSender) {
+    public ReportController(IServiceManager serviceManager, MailSender mailSender) {
         this.serviceManager = serviceManager;
         this.mailSender = mailSender;
     }
 
     @GetMapping("/monthly")
-    public ResponseEntity<String> generateAndSendMonthlyReports(
-            @RequestHeader("X-API-KEY") String providedApiKey) {
-        // Validate API key
-        if (!apiKey.equals(providedApiKey)) {
+    public ResponseEntity<String> generateAndSendMonthlyReports(@RequestHeader("X-API-KEY") String providedApiKey) {
+        if (!isValidApiKey(providedApiKey)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Invalid API Key");
         }
 
-        // Get last month's date range
         YearMonth lastMonth = YearMonth.now().minusMonths(1);
         LocalDate startDate = lastMonth.atDay(1);
         LocalDate endDate = lastMonth.atEndOfMonth();
 
-        // Generate reports for all users
-        List<UserReportResponseDTO> reports = serviceManager.getReportService().generateReportsForAllUsers(startDate, endDate);
-
-        // Send reports via email
-        try {
-            mailSender.sendEmails(reports);
-            return ResponseEntity.ok("Monthly reports generated and emails sent successfully.");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Failed to send emails: " + e.getMessage());
-        }
+        return generateAndSendReports(startDate, endDate, "Monthly reports generated and emails sent successfully.");
     }
 
     @GetMapping("/weekly")
-    public ResponseEntity<String> generateAndSendWeeklyReports(
-            @RequestHeader("X-API-KEY") String providedApiKey) {
-        // Validate API key
-        if (!apiKey.equals(providedApiKey)) {
+    public ResponseEntity<String> generateAndSendWeeklyReports(@RequestHeader("X-API-KEY") String providedApiKey) {
+        if (!isValidApiKey(providedApiKey)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Invalid API Key");
         }
 
-        // Get last week's date range
         LocalDate endDate = LocalDate.now();
         LocalDate startDate = endDate.minusDays(6);
 
-        // Generate reports for all users
+        return generateAndSendReports(startDate, endDate, "Weekly reports generated and emails sent successfully.");
+    }
+
+    private boolean isValidApiKey(String providedApiKey) {
+        return apiKey.equals(providedApiKey);
+    }
+
+    private ResponseEntity<String> generateAndSendReports(LocalDate startDate, LocalDate endDate, String successMessage) {
         List<UserReportResponseDTO> reports = serviceManager.getReportService().generateReportsForAllUsers(startDate, endDate);
 
-        // Send reports via email
         try {
             mailSender.sendEmails(reports);
-            return ResponseEntity.ok("Weekly reports generated and emails sent successfully.");
+            return ResponseEntity.ok(successMessage);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Failed to send emails: " + e.getMessage());

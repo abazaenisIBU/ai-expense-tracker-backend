@@ -1,6 +1,5 @@
-package com.example.aiexpensetracker.core.service.contracts;
+package com.example.aiexpensetracker.core.service.user;
 
-import com.example.aiexpensetracker.core.model.User;
 import com.example.aiexpensetracker.rest.dto.user.CreateUserDTO;
 import com.example.aiexpensetracker.rest.dto.user.UpdateProfilePictureDTO;
 import com.example.aiexpensetracker.rest.dto.user.UpdateUserDTO;

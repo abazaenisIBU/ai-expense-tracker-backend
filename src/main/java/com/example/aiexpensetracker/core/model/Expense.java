@@ -34,10 +34,8 @@ public class Expense {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt = LocalDateTime.now();
 
-    // Default Constructor
     public Expense() {}
 
-    // Getters and Setters
     public Long getId() {
         return id;
     }

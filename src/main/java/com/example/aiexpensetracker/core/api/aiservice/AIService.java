@@ -1,9 +1,9 @@
 package com.example.aiexpensetracker.core.api.aiservice;
 
+import com.example.aiexpensetracker.rest.dto.category.CategorySuggestionResponseDTO;
+
 import java.util.List;
-import java.util.Map;
 
 public interface AIService {
-
-    Map<String, Object> suggestCategory(String description, List<String> existingCategories);
+    CategorySuggestionResponseDTO suggestCategory(String description, List<String> existingCategories);
 }

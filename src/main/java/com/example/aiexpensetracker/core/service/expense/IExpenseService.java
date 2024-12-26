@@ -1,4 +1,4 @@
-package com.example.aiexpensetracker.core.service.contracts;
+package com.example.aiexpensetracker.core.service.expense;
 
 import com.example.aiexpensetracker.rest.dto.expense.*;
 import com.example.aiexpensetracker.rest.dto.statistics.StatisticsResponseDTO;
@@ -14,8 +14,4 @@ public interface IExpenseService {
     ExpenseResponseDTO updateExpense(String userEmail, Long expenseId, UpdateExpenseDTO dto);
 
     void deleteExpense(String userEmail, Long expenseId);
-
-    List<ExpenseResponseDTO> getExpensesByDateRange(String userEmail, LocalDate startDate, LocalDate endDate);
-
-    StatisticsResponseDTO getStatisticsForUser(String email);
 }

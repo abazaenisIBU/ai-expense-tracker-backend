@@ -74,3 +74,4 @@ public class SendGridSender implements MailSender {
         return content.toString();
     }
 }
+

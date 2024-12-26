@@ -1,8 +1,9 @@
-package com.example.aiexpensetracker.core.service;
+package com.example.aiexpensetracker.core.service.user;
 
 import com.example.aiexpensetracker.core.model.User;
-import com.example.aiexpensetracker.core.repository.RepositoryManager;
-import com.example.aiexpensetracker.core.service.contracts.IUserService;
+import com.example.aiexpensetracker.core.repository.manager.IRepositoryManager;
+import com.example.aiexpensetracker.exception.user.EmailAlreadyInUseException;
+import com.example.aiexpensetracker.exception.user.UserNotFoundException;
 import com.example.aiexpensetracker.rest.dto.user.CreateUserDTO;
 import com.example.aiexpensetracker.rest.dto.user.UpdateProfilePictureDTO;
 import com.example.aiexpensetracker.rest.dto.user.UpdateUserDTO;
@@ -13,14 +14,18 @@ import java.util.Optional;
 
 @Service
 public class UserService implements IUserService {
-    private final RepositoryManager repositoryManager;
+    private final IRepositoryManager repositoryManager;
 
-    public UserService(RepositoryManager repositoryManager) {
+    public UserService(IRepositoryManager repositoryManager) {
         this.repositoryManager = repositoryManager;
     }
 
     @Override
     public UserResponseDTO createUser(CreateUserDTO createUserDTO) {
+        if (repositoryManager.getUserRepository().existsByEmail(createUserDTO.getEmail())) {
+            throw new EmailAlreadyInUseException("Email " + createUserDTO.getEmail() + " is already in use.");
+        }
+
         User user = new User();
         user.setEmail(createUserDTO.getEmail());
         user.setFirstName(createUserDTO.getFirstName());
@@ -40,15 +45,18 @@ public class UserService implements IUserService {
 
     @Override
     public UserResponseDTO updateUser(Long id, UpdateUserDTO updateUserDTO) {
-        // If not found, throw a plain RuntimeException
         User user = repositoryManager.getUserRepository()
                 .findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException("User with ID " + id + " not found."));
 
         user.setFirstName(updateUserDTO.getFirstName());
         user.setLastName(updateUserDTO.getLastName());
 
         if (updateUserDTO.getEmail() != null && !updateUserDTO.getEmail().isEmpty()) {
+            if (!user.getEmail().equals(updateUserDTO.getEmail()) &&
+                    repositoryManager.getUserRepository().existsByEmail(updateUserDTO.getEmail())) {
+                throw new EmailAlreadyInUseException("Email " + updateUserDTO.getEmail() + " is already in use.");
+            }
             user.setEmail(updateUserDTO.getEmail());
         }
 
@@ -57,24 +65,22 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void updateProfilePicture(Long id, UpdateProfilePictureDTO updateProfilePictureDTO) {
-        // If not found, throw a plain RuntimeException
+    public void deleteUser(Long id) {
         User user = repositoryManager.getUserRepository()
                 .findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException("User with ID " + id + " not found."));
 
-        user.setProfilePicture(updateProfilePictureDTO.getProfilePicture());
-        repositoryManager.getUserRepository().save(user);
+        repositoryManager.getUserRepository().delete(user);
     }
 
     @Override
-    public void deleteUser(Long id) {
-        // If not found, throw a plain RuntimeException
+    public void updateProfilePicture(Long id, UpdateProfilePictureDTO updateProfilePictureDTO) {
         User user = repositoryManager.getUserRepository()
                 .findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException("User with ID " + id + " not found."));
 
-        repositoryManager.getUserRepository().delete(user);
+        user.setProfilePicture(updateProfilePictureDTO.getProfilePicture());
+        repositoryManager.getUserRepository().save(user);
     }
 
     private UserResponseDTO mapToResponseDTO(User user) {
