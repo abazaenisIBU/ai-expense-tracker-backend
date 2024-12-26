@@ -15,7 +15,6 @@ public class ExpenseResponseDTO {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    // getters & setters
     public Long getId() {
         return id;
     }
