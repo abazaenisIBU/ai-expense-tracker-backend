@@ -2,28 +2,6 @@
 
 **AI Expense Tracker** is a comprehensive solution for tracking and analyzing expenses using AI-powered categorization and reporting. This backend application provides APIs for managing users, expenses, categories, reports, and statistics with features like email notifications, global error handling, and asynchronous request processing.
 
----
-
-## Table of Contents
-
-- [Features](#features)
-- [Technologies Used](#technologies-used)
-- [Setup and Installation](#setup-and-installation)
-- [Environment Variables](#environment-variables)
-- [Endpoints](#endpoints)
-    - [User Management](#user-management)
-    - [Expense Management](#expense-management)
-    - [Category Management](#category-management)
-    - [Reports](#reports)
-    - [Statistics](#statistics)
-- [Architecture](#architecture)
-- [Error Handling](#error-handling)
-- [Future Enhancements](#future-enhancements)
-- [Contribution Guidelines](#contribution-guidelines)
-- [License](#license)
-
----
-
 ## Features
 
 - **User Management:** CRUD operations for users.
@@ -153,28 +131,6 @@
 - `CategoryNotFoundException`
 - `ExpenseNotFoundException`
 - `ExpenseOwnershipException`
-
----
-
-## Future Enhancements
-
-- Add authentication and authorization with JWT.
-- Introduce caching for frequently accessed endpoints.
-- Implement unit and integration tests for improved reliability.
-- Expand AI functionality for more granular suggestions.
-
----
-
-## Contribution Guidelines
-
-We welcome contributions! Please:
-1. Fork the repository.
-2. Create a feature branch: `git checkout -b feature-name`.
-3. Commit your changes: `git commit -m 'Add new feature'`.
-4. Push to the branch: `git push origin feature-name`.
-5. Open a pull request.
-
----
 
 ## License
 
