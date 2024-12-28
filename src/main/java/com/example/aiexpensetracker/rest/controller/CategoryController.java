@@ -37,7 +37,7 @@ public class CategoryController {
             @PathVariable String email
     ) {
         return CompletableFuture.supplyAsync(() -> {
-            List<String> existingCategoryNames = serviceManager.getCategoryService().getAllCategoryNamesByUser(email); // Use the new method
+            List<String> existingCategoryNames = serviceManager.getCategoryService().getAllCategoryNamesByUser(email);
             CategorySuggestionResponseDTO suggestion = aiService.suggestCategory(description, existingCategoryNames);
             return ResponseEntity.ok(suggestion);
         });

@@ -2,6 +2,7 @@ package com.example.aiexpensetracker.core.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity(name = "categories")
 public class Category {
@@ -18,6 +19,9 @@ public class Category {
     @ManyToOne
     @JoinColumn(name = "user_email", nullable = false)
     private User user;
+
+    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Expense> expenses;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
