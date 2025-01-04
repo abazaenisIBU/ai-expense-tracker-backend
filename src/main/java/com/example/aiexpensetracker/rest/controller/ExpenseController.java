@@ -1,61 +1,65 @@
 package com.example.aiexpensetracker.rest.controller;
 
-import com.example.aiexpensetracker.core.service.manager.IServiceManager;
-import com.example.aiexpensetracker.rest.dto.expense.*;
+import com.example.aiexpensetracker.core.service.manager.ServiceManager;
+import com.example.aiexpensetracker.rest.dto.expense.CreateExpenseDTO;
+import com.example.aiexpensetracker.rest.dto.expense.ExpenseResponseDTO;
+import com.example.aiexpensetracker.rest.dto.expense.UpdateExpenseDTO;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.time.LocalDate;
+
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @RestController
 @RequestMapping("/api/expenses")
 public class ExpenseController {
 
-    private final IServiceManager serviceManager;
+    private final ServiceManager serviceManager;
 
-    public ExpenseController(IServiceManager serviceManager) {
+    public ExpenseController(ServiceManager serviceManager) {
         this.serviceManager = serviceManager;
     }
 
     @GetMapping("/user/{email}")
-    public ResponseEntity<List<ExpenseResponseDTO>> getAllExpensesByUser(
+    public CompletableFuture<ResponseEntity<List<ExpenseResponseDTO>>> getAllExpensesByUser(
             @PathVariable String email,
             @RequestParam(required = false) String sortBy,
             @RequestParam(required = false) String direction
     ) {
-        List<ExpenseResponseDTO> expenses = serviceManager.getExpenseService()
-                .getAllExpensesByUser(email, sortBy, direction);
-        return ResponseEntity.ok(expenses);
+        return serviceManager.getExpenseService()
+                .getAllExpensesByUser(email, sortBy, direction)
+                .thenApply(ResponseEntity::ok);
     }
 
     @PostMapping("/user/{email}")
-    public ResponseEntity<ExpenseResponseDTO> createExpense(
+    public CompletableFuture<ResponseEntity<ExpenseResponseDTO>> createExpense(
             @PathVariable String email,
             @Valid @RequestBody CreateExpenseDTO createExpenseDTO
     ) {
-        ExpenseResponseDTO createdExpense = serviceManager.getExpenseService()
-                .createExpense(createExpenseDTO, email);
-        return ResponseEntity.status(201).body(createdExpense);
+        return serviceManager.getExpenseService()
+                .createExpense(createExpenseDTO, email)
+                .thenApply(created -> ResponseEntity.status(201).body(created));
     }
 
     @PutMapping("/user/{email}/{id}")
-    public ResponseEntity<ExpenseResponseDTO> updateExpense(
+    public CompletableFuture<ResponseEntity<ExpenseResponseDTO>> updateExpense(
             @PathVariable String email,
             @PathVariable Long id,
             @Valid @RequestBody UpdateExpenseDTO updateExpenseDTO
     ) {
-        ExpenseResponseDTO updatedExpense = serviceManager.getExpenseService()
-                .updateExpense(email, id, updateExpenseDTO);
-        return ResponseEntity.ok(updatedExpense);
+        return serviceManager.getExpenseService()
+                .updateExpense(email, id, updateExpenseDTO)
+                .thenApply(ResponseEntity::ok);
     }
 
     @DeleteMapping("/user/{email}/{id}")
-    public ResponseEntity<Void> deleteExpense(
+    public CompletableFuture<ResponseEntity<Void>> deleteExpense(
             @PathVariable String email,
             @PathVariable Long id
     ) {
-        serviceManager.getExpenseService().deleteExpense(email, id);
-        return ResponseEntity.noContent().build();
+        return serviceManager.getExpenseService()
+                .deleteExpense(email, id)
+                .thenApply(ignored -> ResponseEntity.noContent().build());
     }
 }

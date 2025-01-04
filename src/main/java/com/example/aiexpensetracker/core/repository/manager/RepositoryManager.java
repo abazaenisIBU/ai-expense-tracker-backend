@@ -1,31 +1,13 @@
 package com.example.aiexpensetracker.core.repository.manager;
 
-import com.example.aiexpensetracker.core.repository.expense.IExpenseRepository;
-import com.example.aiexpensetracker.core.repository.user.IUserRepository;
-import com.example.aiexpensetracker.core.repository.category.ICategoryRepository;
-import org.springframework.stereotype.Component;
+import com.example.aiexpensetracker.core.repository.expense.ExpenseRepository;
+import com.example.aiexpensetracker.core.repository.category.CategoryRepository;
+import com.example.aiexpensetracker.core.repository.user.UserRepository;
 
-@Component
-public class RepositoryManager implements IRepositoryManager {
-    private final IUserRepository IUserRepository;
-    private final IExpenseRepository IExpenseRepository;
-    private final ICategoryRepository ICategoryRepository;
+public interface RepositoryManager {
+    UserRepository getUserRepository();
 
-    public RepositoryManager(IUserRepository IUserRepository, IExpenseRepository IExpenseRepository, ICategoryRepository ICategoryRepository) {
-        this.IUserRepository = IUserRepository;
-        this.IExpenseRepository = IExpenseRepository;
-        this.ICategoryRepository = ICategoryRepository;
-    }
+    ExpenseRepository getExpenseRepository();
 
-    public IUserRepository getUserRepository() {
-        return IUserRepository;
-    }
-
-    public IExpenseRepository getExpenseRepository() {
-        return IExpenseRepository;
-    }
-
-    public ICategoryRepository getCategoryRepository() {
-        return ICategoryRepository;
-    }
+    CategoryRepository getCategoryRepository();
 }

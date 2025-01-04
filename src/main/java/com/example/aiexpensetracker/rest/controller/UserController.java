@@ -1,6 +1,6 @@
 package com.example.aiexpensetracker.rest.controller;
 
-import com.example.aiexpensetracker.core.service.manager.IServiceManager;
+import com.example.aiexpensetracker.core.service.manager.ServiceManager;
 import com.example.aiexpensetracker.exception.user.UserNotFoundException;
 import com.example.aiexpensetracker.rest.dto.user.CreateUserDTO;
 import com.example.aiexpensetracker.rest.dto.user.UpdateProfilePictureDTO;
@@ -17,9 +17,9 @@ import java.util.concurrent.CompletableFuture;
 @RequestMapping("/api/users")
 public class UserController {
 
-    private final IServiceManager serviceManager;
+    private final ServiceManager serviceManager;
 
-    public UserController(IServiceManager serviceManager) {
+    public UserController(ServiceManager serviceManager) {
         this.serviceManager = serviceManager;
     }
 
@@ -27,11 +27,13 @@ public class UserController {
     public CompletableFuture<ResponseEntity<UserResponseDTO>> createUser(
             @Valid @RequestBody CreateUserDTO createUserDTO
     ) {
-        return CompletableFuture.supplyAsync(() -> {
-            UserResponseDTO created = serviceManager.getUserService().createUser(createUserDTO);
-            URI location = URI.create("/api/users/" + created.getEmail());
-            return ResponseEntity.created(location).body(created);
-        });
+        return serviceManager
+                .getUserService()
+                .createUser(createUserDTO)
+                .thenApply(created -> {
+                    URI location = URI.create("/api/users/" + created.getEmail());
+                    return ResponseEntity.created(location).body(created);
+                });
     }
 
     @PostMapping("/{id}/profile-picture")
@@ -39,22 +41,24 @@ public class UserController {
             @PathVariable Long id,
             @RequestBody UpdateProfilePictureDTO updateProfilePictureDTO
     ) {
-        return CompletableFuture.supplyAsync(() -> {
-            serviceManager.getUserService().updateProfilePicture(id, updateProfilePictureDTO);
-            return ResponseEntity.ok().build();
-        });
+        return serviceManager
+                .getUserService()
+                .updateProfilePicture(id, updateProfilePictureDTO)
+                .thenApply(ignored -> ResponseEntity.ok().build());
     }
 
     @GetMapping("/{email}")
     public CompletableFuture<ResponseEntity<UserResponseDTO>> getUserByEmail(
             @PathVariable String email
     ) {
-        return CompletableFuture.supplyAsync(() -> {
-            UserResponseDTO user = serviceManager.getUserService()
-                    .getUserByEmail(email)
-                    .orElseThrow(() -> new UserNotFoundException("User with email " + email + " not found."));
-            return ResponseEntity.ok(user);
-        });
+        return serviceManager
+                .getUserService()
+                .getUserByEmail(email)
+                .thenApply(optionalUser -> {
+                    UserResponseDTO user = optionalUser.orElseThrow(() ->
+                            new UserNotFoundException("User with email " + email + " not found."));
+                    return ResponseEntity.ok(user);
+                });
     }
 
     @PutMapping("/{id}")
@@ -62,19 +66,17 @@ public class UserController {
             @PathVariable Long id,
             @Valid @RequestBody UpdateUserDTO updateUserDTO
     ) {
-        return CompletableFuture.supplyAsync(() -> {
-            UserResponseDTO updated = serviceManager.getUserService().updateUser(id, updateUserDTO);
-            return ResponseEntity.ok(updated);
-        });
+        return serviceManager
+                .getUserService()
+                .updateUser(id, updateUserDTO)
+                .thenApply(updated -> ResponseEntity.ok(updated));
     }
 
     @DeleteMapping("/{id}")
     public CompletableFuture<ResponseEntity<Void>> deleteUser(@PathVariable Long id) {
-        return CompletableFuture.supplyAsync(() -> {
-            serviceManager.getUserService().deleteUser(id);
-            return ResponseEntity.noContent().build();
-        });
+        return serviceManager
+                .getUserService()
+                .deleteUser(id)
+                .thenApply(ignored -> ResponseEntity.noContent().build());
     }
 }
-
-

@@ -1,39 +1,38 @@
 package com.example.aiexpensetracker.rest.controller;
 
 import com.example.aiexpensetracker.core.api.mailsender.MailSender;
-import com.example.aiexpensetracker.core.service.manager.IServiceManager;
-import com.example.aiexpensetracker.rest.dto.report.UserReportResponseDTO;
+import com.example.aiexpensetracker.core.service.manager.ServiceManager;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.time.YearMonth;
-import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @RestController
 @RequestMapping("/api/reports")
 public class ReportController {
 
-    private final IServiceManager serviceManager;
+    private final ServiceManager serviceManager;
     private final MailSender mailSender;
 
     @Value("${api.key}")
     private String apiKey;
 
-    public ReportController(IServiceManager serviceManager, MailSender mailSender) {
+    public ReportController(ServiceManager serviceManager, MailSender mailSender) {
         this.serviceManager = serviceManager;
         this.mailSender = mailSender;
     }
 
     @GetMapping("/monthly")
-    public ResponseEntity<String> generateAndSendMonthlyReports(@RequestHeader("X-API-KEY") String providedApiKey) {
+    public CompletableFuture<ResponseEntity<String>> generateAndSendMonthlyReports(
+            @RequestHeader("X-API-KEY") String providedApiKey
+    ) {
         if (!isValidApiKey(providedApiKey)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Invalid API Key");
+            return CompletableFuture.completedFuture(
+                    ResponseEntity.status(HttpStatus.FORBIDDEN).body("Invalid API Key"));
         }
 
         YearMonth lastMonth = YearMonth.now().minusMonths(1);
@@ -44,9 +43,12 @@ public class ReportController {
     }
 
     @GetMapping("/weekly")
-    public ResponseEntity<String> generateAndSendWeeklyReports(@RequestHeader("X-API-KEY") String providedApiKey) {
+    public CompletableFuture<ResponseEntity<String>> generateAndSendWeeklyReports(
+            @RequestHeader("X-API-KEY") String providedApiKey
+    ) {
         if (!isValidApiKey(providedApiKey)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Invalid API Key");
+            return CompletableFuture.completedFuture(
+                    ResponseEntity.status(HttpStatus.FORBIDDEN).body("Invalid API Key"));
         }
 
         LocalDate endDate = LocalDate.now();
@@ -59,15 +61,21 @@ public class ReportController {
         return apiKey.equals(providedApiKey);
     }
 
-    private ResponseEntity<String> generateAndSendReports(LocalDate startDate, LocalDate endDate, String successMessage) {
-        List<UserReportResponseDTO> reports = serviceManager.getReportService().generateReportsForAllUsers(startDate, endDate);
-
-        try {
-            mailSender.sendEmails(reports);
-            return ResponseEntity.ok(successMessage);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Failed to send emails: " + e.getMessage());
-        }
+    private CompletableFuture<ResponseEntity<String>> generateAndSendReports(
+            LocalDate startDate,
+            LocalDate endDate,
+            String successMessage
+    ) {
+        return serviceManager.getReportService()
+                .generateReportsForAllUsers(startDate, endDate)
+                .thenApply(reports -> {
+                    try {
+                        mailSender.sendEmails(reports);
+                        return ResponseEntity.ok(successMessage);
+                    } catch (Exception e) {
+                        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                .body("Failed to send emails: " + e.getMessage());
+                    }
+                });
     }
 }

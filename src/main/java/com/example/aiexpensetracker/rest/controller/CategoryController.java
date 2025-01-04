@@ -1,11 +1,11 @@
 package com.example.aiexpensetracker.rest.controller;
 
-import com.example.aiexpensetracker.core.api.aiservice.AIService;
-import com.example.aiexpensetracker.core.service.manager.IServiceManager;
+import com.example.aiexpensetracker.core.service.manager.ServiceManager;
 import com.example.aiexpensetracker.rest.dto.category.*;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -13,22 +13,19 @@ import java.util.concurrent.CompletableFuture;
 @RequestMapping("/api/categories")
 public class CategoryController {
 
-    private final IServiceManager serviceManager;
-    private final AIService aiService;
+    private final ServiceManager serviceManager;
 
-    public CategoryController(IServiceManager serviceManager, AIService aiService) {
+    public CategoryController(ServiceManager serviceManager) {
         this.serviceManager = serviceManager;
-        this.aiService = aiService;
     }
 
     @GetMapping("/user/{email}")
     public CompletableFuture<ResponseEntity<List<CategoryResponseDTO>>> getAllCategoriesByUser(
             @PathVariable String email
     ) {
-        return CompletableFuture.supplyAsync(() -> {
-            List<CategoryResponseDTO> categories = serviceManager.getCategoryService().getAllCategoriesByUser(email);
-            return ResponseEntity.ok(categories);
-        });
+        return serviceManager.getCategoryService()
+                .getAllCategoriesByUser(email)
+                .thenApply(ResponseEntity::ok);
     }
 
     @PostMapping("/user/suggest/{email}")
@@ -36,11 +33,9 @@ public class CategoryController {
             @RequestParam String description,
             @PathVariable String email
     ) {
-        return CompletableFuture.supplyAsync(() -> {
-            List<String> existingCategoryNames = serviceManager.getCategoryService().getAllCategoryNamesByUser(email);
-            CategorySuggestionResponseDTO suggestion = aiService.suggestCategory(description, existingCategoryNames);
-            return ResponseEntity.ok(suggestion);
-        });
+        return serviceManager.getCategoryService()
+                .suggestCategory(description, email)
+                .thenApply(ResponseEntity::ok);
     }
 
     @PostMapping("/user/{email}")
@@ -48,10 +43,9 @@ public class CategoryController {
             @Valid @RequestBody CreateCategoryDTO createCategoryDTO,
             @PathVariable String email
     ) {
-        return CompletableFuture.supplyAsync(() -> {
-            CategoryResponseDTO createdCategory = serviceManager.getCategoryService().createCategory(createCategoryDTO, email);
-            return ResponseEntity.status(201).body(createdCategory);
-        });
+        return serviceManager.getCategoryService()
+                .createCategory(createCategoryDTO, email)
+                .thenApply(createdCategory -> ResponseEntity.status(201).body(createdCategory));
     }
 
     @PutMapping("/user/{email}/{id}")
@@ -60,10 +54,9 @@ public class CategoryController {
             @PathVariable Long id,
             @Valid @RequestBody UpdateCategoryDTO updateCategoryDTO
     ) {
-        return CompletableFuture.supplyAsync(() -> {
-            CategoryResponseDTO updatedCategory = serviceManager.getCategoryService().updateCategory(email, id, updateCategoryDTO);
-            return ResponseEntity.ok(updatedCategory);
-        });
+        return serviceManager.getCategoryService()
+                .updateCategory(email, id, updateCategoryDTO)
+                .thenApply(ResponseEntity::ok);
     }
 
     @DeleteMapping("/user/{email}/{id}")
@@ -71,9 +64,8 @@ public class CategoryController {
             @PathVariable String email,
             @PathVariable Long id
     ) {
-        return CompletableFuture.supplyAsync(() -> {
-            serviceManager.getCategoryService().deleteCategory(email, id);
-            return ResponseEntity.noContent().build();
-        });
+        return serviceManager.getCategoryService()
+                .deleteCategory(email, id)
+                .thenApply(ignored -> ResponseEntity.noContent().build());
     }
 }
