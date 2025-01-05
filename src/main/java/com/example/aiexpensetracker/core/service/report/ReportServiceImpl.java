@@ -54,13 +54,13 @@ public class ReportServiceImpl implements ReportService {
         );
     }
 
-    private BigDecimal calculateTotalAmount(List<Expense> expenses) {
+    public BigDecimal calculateTotalAmount(List<Expense> expenses) {
         return expenses.stream()
                 .map(Expense::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    private List<CategoryTotalDTO> calculateCategoryTotals(List<Expense> expenses) {
+    public List<CategoryTotalDTO> calculateCategoryTotals(List<Expense> expenses) {
         Map<String, BigDecimal> amountByCategory = expenses.stream()
                 .collect(Collectors.groupingBy(
                         expense -> expense.getCategory().getName(),
@@ -75,7 +75,7 @@ public class ReportServiceImpl implements ReportService {
                 .collect(Collectors.toList());
     }
 
-    private List<ExpenseDTO> mapToExpenseDTOs(List<Expense> expenses) {
+    public List<ExpenseDTO> mapToExpenseDTOs(List<Expense> expenses) {
         return expenses.stream()
                 .map(expense -> new ExpenseDTO(
                         expense.getId(),
