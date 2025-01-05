@@ -27,7 +27,7 @@ jobs:
         env:
           RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
         run: |
-          render workspace set aitodo-workspace -o json
+          render workspace set aiexpensetracker-workspace -o json
       # Step 4: Get Commit SHA
       - name: Get Commit SHA
         id: git-info
