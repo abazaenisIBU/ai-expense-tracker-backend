@@ -18,6 +18,10 @@ public class UserReportResponseDTO {
         this.categoryTotals = categoryTotals;
     }
 
+    public UserReportResponseDTO() {
+
+    }
+
     public String getUserEmail() {
         return userEmail;
     }

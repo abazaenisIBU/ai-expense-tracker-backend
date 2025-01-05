@@ -54,6 +54,7 @@ public class CategoryController {
             @PathVariable Long id,
             @Valid @RequestBody UpdateCategoryDTO updateCategoryDTO
     ) {
+        System.out.println("DEBUG - Invoking updateCategory for email: " + email + ", id: " + id);
         return serviceManager.getCategoryService()
                 .updateCategory(email, id, updateCategoryDTO)
                 .thenApply(ResponseEntity::ok);

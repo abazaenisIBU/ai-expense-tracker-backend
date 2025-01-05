@@ -23,6 +23,6 @@ public class StatisticsController {
     ) {
         return serviceManager.getStatisticsService()
                 .getStatisticsForUser(email)
-                .thenApply(statistics -> ResponseEntity.ok(statistics));
+                .thenApply(ResponseEntity::ok);
     }
 }
