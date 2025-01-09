@@ -11,6 +11,10 @@ import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * REST controller for generating and sending reports in the AI Expense Tracker application.
+ * Provides endpoints to generate and send both monthly and weekly reports via email.
+ */
 @RestController
 @RequestMapping("/api/reports")
 public class ReportController {
@@ -21,11 +25,24 @@ public class ReportController {
     @Value("${api.key}")
     private String apiKey;
 
+    /**
+     * Constructs a new ReportController with the provided ServiceManager and MailSender.
+     *
+     * @param serviceManager the ServiceManager instance that provides access to various services.
+     * @param mailSender     the MailSender instance responsible for sending emails.
+     */
     public ReportController(ServiceManager serviceManager, MailSender mailSender) {
         this.serviceManager = serviceManager;
         this.mailSender = mailSender;
     }
 
+    /**
+     * Generates and sends monthly reports for all users.
+     * Requires a valid API key provided in the request header.
+     *
+     * @param providedApiKey the API key provided in the "X-API-KEY" header.
+     * @return a CompletableFuture containing a ResponseEntity with a success message or an error message.
+     */
     @GetMapping("/monthly")
     public CompletableFuture<ResponseEntity<String>> generateAndSendMonthlyReports(
             @RequestHeader("X-API-KEY") String providedApiKey
@@ -42,6 +59,13 @@ public class ReportController {
         return generateAndSendReports(startDate, endDate, "Monthly reports generated and emails sent successfully.");
     }
 
+    /**
+     * Generates and sends weekly reports for all users.
+     * Requires a valid API key provided in the request header.
+     *
+     * @param providedApiKey the API key provided in the "X-API-KEY" header.
+     * @return a CompletableFuture containing a ResponseEntity with a success message or an error message.
+     */
     @GetMapping("/weekly")
     public CompletableFuture<ResponseEntity<String>> generateAndSendWeeklyReports(
             @RequestHeader("X-API-KEY") String providedApiKey
@@ -57,10 +81,24 @@ public class ReportController {
         return generateAndSendReports(startDate, endDate, "Weekly reports generated and emails sent successfully.");
     }
 
+    /**
+     * Validates the provided API key against the configured API key.
+     *
+     * @param providedApiKey the API key provided in the request.
+     * @return true if the API key is valid, false otherwise.
+     */
     private boolean isValidApiKey(String providedApiKey) {
         return apiKey.equals(providedApiKey);
     }
 
+    /**
+     * Generates reports for all users within the specified date range and sends them via email.
+     *
+     * @param startDate     the start date of the report period.
+     * @param endDate       the end date of the report period.
+     * @param successMessage the success message to return if the emails are sent successfully.
+     * @return a CompletableFuture containing a ResponseEntity with a success message or an error message.
+     */
     private CompletableFuture<ResponseEntity<String>> generateAndSendReports(
             LocalDate startDate,
             LocalDate endDate,
