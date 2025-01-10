@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public interface ExpenseService {
-    CompletableFuture<List<ExpenseResponseDTO>> getAllExpensesByUser(String userEmail, String sortBy, String direction);
+    CompletableFuture<List<ExpenseResponseDTO>> getAllExpensesByUser(String userEmail, String sortBy, String direction, String filterColumn, String filterValue);
 
     CompletableFuture<ExpenseResponseDTO> createExpense(CreateExpenseDTO dto, String userEmail);
 

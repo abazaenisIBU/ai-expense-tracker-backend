@@ -14,6 +14,9 @@ import com.example.aiexpensetracker.rest.dto.expense.UpdateExpenseDTO;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -33,13 +36,66 @@ public class ExpenseServiceImpl implements ExpenseService {
     public CompletableFuture<List<ExpenseResponseDTO>> getAllExpensesByUser(
             String userEmail,
             String sortField,
-            String direction
+            String direction,
+            String filterColumn,
+            String filterValue
     ) {
         return CompletableFuture.supplyAsync(() -> {
             List<Expense> expenses = repositoryManager.getExpenseRepository()
                     .findByUserEmail(userEmail);
 
-            // Create final local variables
+            if (filterColumn != null && !filterColumn.isBlank()
+                    && filterValue != null && !filterValue.isBlank()) {
+                switch (filterColumn.toLowerCase()) {
+                    case "category":
+                        expenses = expenses.stream()
+                                .filter(e -> e.getCategory() != null
+                                        && e.getCategory().getId() != null
+                                        && e.getCategory().getId().toString().contains(filterValue))
+                                .collect(Collectors.toList());
+                        break;
+
+                    case "amount":
+                        expenses = expenses.stream()
+                                .filter(e -> e.getAmount() != null
+                                        && e.getAmount().toString().contains(filterValue))
+                                .collect(Collectors.toList());
+                        break;
+
+                    case "date":
+                        expenses = expenses.stream()
+                                .filter(e -> e.getDate() != null
+                                        && e.getDate().toString().contains(filterValue))
+                                .collect(Collectors.toList());
+                        break;
+
+                    case "description":
+                        String filterValueLower = filterValue.toLowerCase();
+                        expenses = expenses.stream()
+                                .filter(e -> e.getDescription() != null
+                                        && e.getDescription().toLowerCase().contains(filterValueLower))
+                                .collect(Collectors.toList());
+                        break;
+
+                    case "createdat":
+                        expenses = expenses.stream()
+                                .filter(e -> e.getCreatedAt() != null
+                                        && e.getCreatedAt().toString().contains(filterValue))
+                                .collect(Collectors.toList());
+                        break;
+
+                    case "updatedat":
+                        expenses = expenses.stream()
+                                .filter(e -> e.getUpdatedAt() != null
+                                        && e.getUpdatedAt().toString().contains(filterValue))
+                                .collect(Collectors.toList());
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+
             final String finalSortField = (sortField == null || sortField.isEmpty())
                     ? "date"
                     : sortField;

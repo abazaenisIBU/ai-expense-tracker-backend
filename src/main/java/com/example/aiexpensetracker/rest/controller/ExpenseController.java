@@ -25,10 +25,12 @@ public class ExpenseController {
     public CompletableFuture<ResponseEntity<List<ExpenseResponseDTO>>> getAllExpensesByUser(
             @PathVariable String email,
             @RequestParam(required = false) String sortBy,
-            @RequestParam(required = false) String direction
+            @RequestParam(required = false) String direction,
+            @RequestParam(required = false) String filterColumn,
+            @RequestParam(required = false) String filterValue
     ) {
         return serviceManager.getExpenseService()
-                .getAllExpensesByUser(email, sortBy, direction)
+                .getAllExpensesByUser(email, sortBy, direction, filterColumn, filterValue)
                 .thenApply(ResponseEntity::ok);
     }
 
