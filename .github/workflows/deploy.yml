@@ -8,6 +8,7 @@ on:
       - 'v*' # Trigger the workflow for tags starting with 'v'
     branches:
       - 'AddUnitTests' # Trigger the workflow when pushing to AddUnitTests branch - TESTING PURPOSES
+      - 'main'
 
 jobs:
   deploy:
