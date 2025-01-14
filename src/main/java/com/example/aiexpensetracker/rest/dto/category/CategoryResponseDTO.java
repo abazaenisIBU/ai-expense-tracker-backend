@@ -7,7 +7,7 @@ public class CategoryResponseDTO {
     private String name;
     private String description;
 
-    private Long userId; // optional: if you want to show which user owns it
+    private Long userId;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
