@@ -84,7 +84,7 @@ public class ExpenseServiceImplTest {
                 .thenReturn(expenses);
 
         CompletableFuture<List<ExpenseResponseDTO>> resultFuture =
-                expenseService.getAllExpensesByUser(testUser.getEmail(), "date", "asc");
+                expenseService.getAllExpensesByUser(testUser.getEmail(), "date", "asc", null, null);
 
         List<ExpenseResponseDTO> result = resultFuture.get();
         assertNotNull(result);

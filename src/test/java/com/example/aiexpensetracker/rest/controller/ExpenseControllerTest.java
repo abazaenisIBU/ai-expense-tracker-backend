@@ -69,7 +69,7 @@ public class ExpenseControllerTest {
         expense2.setDate(LocalDate.from(LocalDateTime.now().minusDays(2)));
 
         List<ExpenseResponseDTO> mockExpenses = Arrays.asList(expense1, expense2);
-        when(expenseService.getAllExpensesByUser(email, null, null))
+        when(expenseService.getAllExpensesByUser(email, null, null, null, null))
                 .thenReturn(CompletableFuture.completedFuture(mockExpenses));
 
         mockMvc.perform(get("/api/expenses/user/{email}", email))
