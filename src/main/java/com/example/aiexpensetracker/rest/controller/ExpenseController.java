@@ -3,6 +3,7 @@ package com.example.aiexpensetracker.rest.controller;
 import com.example.aiexpensetracker.core.service.manager.ServiceManager;
 import com.example.aiexpensetracker.rest.dto.expense.CreateExpenseDTO;
 import com.example.aiexpensetracker.rest.dto.expense.ExpenseResponseDTO;
+import com.example.aiexpensetracker.rest.dto.expense.ExpensesByCategoryDTO;
 import com.example.aiexpensetracker.rest.dto.expense.UpdateExpenseDTO;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -48,6 +49,21 @@ public class ExpenseController {
     ) {
         return serviceManager.getExpenseService()
                 .getAllExpensesByUser(email, sortBy, direction, filterColumn, filterValue)
+                .thenApply(ResponseEntity::ok);
+    }
+
+    /**
+     * Retrieves all expenses for a given user grouped by category.
+     *
+     * @param email the user's email
+     * @return a CompletableFuture containing a ResponseEntity with a list of ExpensesByCategoryDTO objects.
+     */
+    @GetMapping("/user/{email}/by-category")
+    public CompletableFuture<ResponseEntity<List<ExpensesByCategoryDTO>>> getExpensesByCategory(
+            @PathVariable String email
+    ) {
+        return serviceManager.getExpenseService()
+                .getExpensesGroupedByCategory(email)
                 .thenApply(ResponseEntity::ok);
     }
 
