@@ -48,4 +48,12 @@ public interface ExpenseService {
      * @return a CompletableFuture representing the completion of the delete operation.
      */
     CompletableFuture<Void> deleteExpense(String userEmail, Long expenseId);
+
+    /**
+     * Retrieves all expenses for a given user grouped by category.
+     *
+     * @param userEmail the email of the user
+     * @return a CompletableFuture containing a list of ExpensesByCategoryDTO objects.
+     */
+    CompletableFuture<List<ExpensesByCategoryDTO>> getExpensesGroupedByCategory(String userEmail);
 }

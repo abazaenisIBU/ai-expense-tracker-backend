@@ -10,6 +10,7 @@ import com.example.aiexpensetracker.exception.expense.ExpenseOwnershipException;
 import com.example.aiexpensetracker.exception.user.UserNotFoundException;
 import com.example.aiexpensetracker.rest.dto.expense.CreateExpenseDTO;
 import com.example.aiexpensetracker.rest.dto.expense.ExpenseResponseDTO;
+import com.example.aiexpensetracker.rest.dto.expense.ExpensesByCategoryDTO;
 import com.example.aiexpensetracker.rest.dto.expense.UpdateExpenseDTO;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -30,6 +32,49 @@ public class ExpenseServiceImpl implements ExpenseService {
     public ExpenseServiceImpl(RepositoryManager repositoryManager) {
         this.repositoryManager = repositoryManager;
     }
+
+    @Async
+    @Override
+    public CompletableFuture<List<ExpensesByCategoryDTO>> getExpensesGroupedByCategory(String userEmail) {
+        return CompletableFuture.supplyAsync(() -> {
+            // Verify that the user exists (or throw an exception)
+            User user = repositoryManager.getUserRepository()
+                    .findByEmail(userEmail)
+                    .orElseThrow(() -> new UserNotFoundException("User not found: " + userEmail));
+
+            // Retrieve all expenses for the user
+            List<Expense> expenses = repositoryManager.getExpenseRepository().findByUserEmail(userEmail);
+
+            // Retrieve all categories from the database and build a lookup map (id -> name)
+            List<Category> allCategories = repositoryManager.getCategoryRepository().findAll();
+            // Create a lookup map for categoryId to category name
+            Map<Long, String> categoryLookup = allCategories.stream()
+                    .collect(Collectors.toMap(Category::getId, Category::getName));
+
+            // Map expenses to ExpenseResponseDTO using your existing mapping method.
+            // Note: In this case, the DTO does NOT have a categoryName field.
+            List<ExpenseResponseDTO> expenseDTOs = expenses.stream()
+                    .map(this::mapToResponseDTO)
+                    .collect(Collectors.toList());
+
+            // Group expense DTOs by category name by looking up the category name from the categoryLookup map.
+            // If an expense has a categoryId, use the name from the map, otherwise fallback to "Uncategorized".
+            Map<String, List<ExpenseResponseDTO>> grouped = expenseDTOs.stream()
+                    .collect(Collectors.groupingBy(expense -> {
+                        if (expense.getCategoryId() != null) {
+                            return categoryLookup.getOrDefault(expense.getCategoryId(), "Uncategorized");
+                        } else {
+                            return "Uncategorized";
+                        }
+                    }));
+
+            // Convert the grouped map into a list of ExpensesByCategoryDTO objects.
+            return grouped.entrySet().stream()
+                    .map(entry -> new ExpensesByCategoryDTO(entry.getKey(), entry.getValue()))
+                    .collect(Collectors.toList());
+        });
+    }
+
 
     @Async
     @Override
