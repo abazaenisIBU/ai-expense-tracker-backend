@@ -1,46 +1,73 @@
-name: Deploy to Render
+name: Deploy to Render (build gated by tests)
 
 on:
   release:
-    types: [published] # Trigger the workflow when a release is published
+    types: [ published ]          # GitHub release
   push:
-    tags:
-      - 'v*' # Trigger the workflow for tags starting with 'v'
+    tags:     [ 'v*' ]            # any tag that starts with v
     branches:
-      - 'AddUnitTests' # Trigger the workflow when pushing to AddUnitTests branch - TESTING PURPOSES
       - 'main'
+      - 'test/software-verification-validation-testing' # Testing purposes
 
 jobs:
-  deploy:
+  # ---------- 1. TEST JOB ----------
+  test-backend:
     runs-on: ubuntu-latest
+    name: Maven verify
 
     steps:
-      # Step 1: Checkout the code from the repository
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      # Step 2: Install Render CLI
+      - name: Set up Temurin JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Run Maven verify
+        run: mvn -B --fail-at-end verify
+        env:
+          SPRING_PROFILES_ACTIVE: test
+
+  # ---------- 2. DEPLOY JOB ----------
+  deploy:
+    needs: test-backend          # only run if tests succeed
+    runs-on: ubuntu-latest
+    name: Deploy to Render
+
+    steps:
+      # 1) Checkout (again – this job has its own workspace)
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2) Install Render CLI
       - name: Install Render CLI
         run: |
           curl -fsSL https://raw.githubusercontent.com/render-oss/cli/refs/heads/main/bin/install.sh | sh
-      # Step 3: Set Render Workspace
+
+      # 3) Set Render workspace
       - name: Set Render Workspace
         env:
           RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
         run: |
           render workspace set aiexpensetracker-workspace -o json
-      # Step 4: Get Commit SHA
-      - name: Get Commit SHA
-        id: git-info
-        run: echo "commit=$(git rev-parse HEAD)" >> $GITHUB_ENV
 
-      # Step 5: Verify Render CLI Installation
-      - name: Verify Render CLI Installation
+      # 4) Capture commit SHA (used by Render)
+      - name: Get commit SHA
+        id: git-info
+        run: echo "commit=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+
+      # 5) Verify CLI
+      - name: Render CLI version
         run: render --version
 
-      # Step 6: Deploy the application to Render
-      - name: Deploy to Render
+      # 6) Deploy
+      - name: Trigger Render Deploy
         env:
           RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
         run: |
-          render deploys create ${{ secrets.RENDER_SERVICE_ID }} --commit ${{ env.commit }} -o json --confirm
+          render deploys create ${{ secrets.RENDER_SERVICE_ID }} \
+            --commit "$commit" \
+            -o json --confirm
