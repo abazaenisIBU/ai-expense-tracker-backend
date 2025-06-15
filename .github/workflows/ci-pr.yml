@@ -1,0 +1,37 @@
+name: CI - Backend Tests on Pull Requests
+
+on:
+  pull_request:       # any PR against any branch
+  push:
+    branches:
+      - 'regression-test'
+
+jobs:
+  test-backend:
+    runs-on: ubuntu-latest
+    name: Maven verify (unit + IT)
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Temurin JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Run Maven verify
+        run: mvn -B --fail-at-end verify
+        env:
+          SPRING_PROFILES_ACTIVE: test   # forces in-memory DB & mocks
+
+      - name: Upload JUnit reports
+        if: always()                     # still upload on failure
+        uses: actions/upload-artifact@v4
+        with:
+          name: junit-backend
+          path: |
+            **/target/surefire-reports/*.xml
+            **/target/failsafe-reports/*.xml
