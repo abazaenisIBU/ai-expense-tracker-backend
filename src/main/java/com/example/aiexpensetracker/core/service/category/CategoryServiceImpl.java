@@ -59,6 +59,11 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Async
     public CompletableFuture<CategorySuggestionResponseDTO> suggestCategory(String description, String email) {
+
+        if (description == null || description.isEmpty()) {
+            throw new CategoryNotFoundException("Description or Email address not found.");
+        }
+
         return getAllCategoryNamesByUser(email)
                 .thenApply(existingNames -> {
                     return aiService.suggestCategory(description, existingNames);
