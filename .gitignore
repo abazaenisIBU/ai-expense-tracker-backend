@@ -6,6 +6,8 @@ target/
 
 .env
 
+application-local.properties
+
 ### STS ###
 .apt_generated
 .classpath
@@ -33,3 +35,4 @@ build/
 
 ### VS Code ###
 .vscode/
+htmlReport/

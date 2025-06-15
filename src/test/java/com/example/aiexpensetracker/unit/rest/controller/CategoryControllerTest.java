@@ -1,7 +1,8 @@
-package com.example.aiexpensetracker.rest.controller;
+package com.example.aiexpensetracker.unit.rest.controller;
 
 import com.example.aiexpensetracker.core.service.category.CategoryService;
 import com.example.aiexpensetracker.core.service.manager.ServiceManager;
+import com.example.aiexpensetracker.rest.controller.CategoryController;
 import com.example.aiexpensetracker.rest.dto.category.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;

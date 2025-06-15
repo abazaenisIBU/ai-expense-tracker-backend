@@ -1,4 +1,4 @@
-package com.example.aiexpensetracker.core.service;
+package com.example.aiexpensetracker.unit.core.service;
 
 import com.example.aiexpensetracker.core.api.aiservice.AIService;
 import com.example.aiexpensetracker.core.model.Category;

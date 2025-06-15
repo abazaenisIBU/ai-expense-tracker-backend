@@ -1,8 +1,9 @@
-package com.example.aiexpensetracker.rest.controller;
+package com.example.aiexpensetracker.unit.rest.controller;
 
 import com.example.aiexpensetracker.core.service.manager.ServiceManager;
 import com.example.aiexpensetracker.core.service.user.UserService;
 import com.example.aiexpensetracker.exception.user.UserNotFoundException;
+import com.example.aiexpensetracker.rest.controller.UserController;
 import com.example.aiexpensetracker.rest.dto.user.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;

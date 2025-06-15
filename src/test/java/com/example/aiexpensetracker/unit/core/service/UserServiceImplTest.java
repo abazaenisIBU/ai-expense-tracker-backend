@@ -1,4 +1,4 @@
-package com.example.aiexpensetracker.core.service;
+package com.example.aiexpensetracker.unit.core.service;
 
 import com.example.aiexpensetracker.core.model.User;
 import com.example.aiexpensetracker.core.repository.manager.RepositoryManager;

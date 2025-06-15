@@ -1,8 +1,9 @@
-package com.example.aiexpensetracker.rest.controller;
+package com.example.aiexpensetracker.unit.rest.controller;
 
 import com.example.aiexpensetracker.core.api.mailsender.MailSender;
 import com.example.aiexpensetracker.core.service.manager.ServiceManager;
 import com.example.aiexpensetracker.core.service.report.ReportService;
+import com.example.aiexpensetracker.rest.controller.ReportController;
 import com.example.aiexpensetracker.rest.dto.report.UserReportResponseDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

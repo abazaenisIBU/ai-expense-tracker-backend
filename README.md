@@ -132,9 +132,24 @@
 - `ExpenseNotFoundException`
 - `ExpenseOwnershipException`
 
+## Testing & Quality Assurance
+- **Static Analysis**: Uses **SpotBugs**, **PMD**, and **Checkstyle** in Maven builds (`mvn verify`) to enforce code quality and catch bugs.
+- **Unit Testing**: JUnit 5 and Mockito for testing controllers, services, and repositories. Uses MockMvc for HTTP request simulation and H2 for repository tests.
+- **Integration Testing**: Tests full stack (controller to database) with Spring Boot's testing support and H2 database. Mocks external services (OpenAI, SendGrid).
+- **System Testing**: Manual end-to-end tests on the deployed app to verify user workflows.
+- **Test Coverage**: Achieves ~87% line coverage and ~98% class coverage using JaCoCo.
+- **CI/CD**: GitHub Actions runs static analysis and tests on pull requests and main branch pushes. Deploys to Render only if tests pass.
+
+## Continuous Integration & Deployment
+- **GitHub Actions**:
+  - **Pull Requests**: Runs linting, static analysis, and tests for backend (Maven) and frontend (Jest).
+  - **Main Branch**: Runs full test suite and deploys backend (Render JAR) and frontend (static site) if tests pass.
+- **Render Deployment**:
+  - Backend: Spring Boot JAR with PostgreSQL connection.
+  - Frontend: Optimized static site from `npm run build`.
+
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
 ---
-

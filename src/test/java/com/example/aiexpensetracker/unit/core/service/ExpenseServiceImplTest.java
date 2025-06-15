@@ -1,4 +1,4 @@
-package com.example.aiexpensetracker.core.service;
+package com.example.aiexpensetracker.unit.core.service;
 
 import com.example.aiexpensetracker.core.model.Category;
 import com.example.aiexpensetracker.core.model.Expense;
@@ -12,6 +12,7 @@ import com.example.aiexpensetracker.exception.expense.ExpenseOwnershipException;
 import com.example.aiexpensetracker.exception.user.UserNotFoundException;
 import com.example.aiexpensetracker.rest.dto.expense.CreateExpenseDTO;
 import com.example.aiexpensetracker.rest.dto.expense.ExpenseResponseDTO;
+import com.example.aiexpensetracker.rest.dto.expense.ExpensesByCategoryDTO;
 import com.example.aiexpensetracker.rest.dto.expense.UpdateExpenseDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -229,5 +230,62 @@ public class ExpenseServiceImplTest {
                 throw (RuntimeException) ex.getCause();
             }
         });
+    }
+
+    @Test
+    void testGetExpensesGroupedByCategory_userNotFound() {
+        // Arrange
+        when(userRepository.findByEmail("missing@x.com"))
+                .thenReturn(Optional.empty());
+
+        // Act + Assert
+        CompletableFuture<List<ExpensesByCategoryDTO>> future =
+                expenseService.getExpensesGroupedByCategory("missing@x.com");
+
+        CompletionException ex = assertThrows(CompletionException.class, future::join);
+        assertInstanceOf(UserNotFoundException.class, ex.getCause());
+    }
+
+    @Test
+    void testGetAllExpensesByUser_filterByDescription_andSortByAmountDesc() throws Exception {
+        // Arrange
+        String email = testUser.getEmail();
+
+        Expense expA = new Expense();
+        expA.setId(1L);
+        expA.setUser(testUser);
+        expA.setAmount(BigDecimal.valueOf(10));
+        expA.setDate(LocalDate.of(2025, 5, 1));
+        expA.setDescription("Coffee");
+
+        Expense expB = new Expense();
+        expB.setId(2L);
+        expB.setUser(testUser);
+        expB.setAmount(BigDecimal.valueOf(5));
+        expB.setDate(LocalDate.of(2025, 5, 2));
+        expB.setDescription("Book purchase");
+
+        Expense expC = new Expense();
+        expC.setId(3L);
+        expC.setUser(testUser);
+        expC.setAmount(BigDecimal.valueOf(20));
+        expC.setDate(LocalDate.of(2025, 5, 3));
+        expC.setDescription("Coffee beans");
+
+        when(expenseRepository.findByUserEmail(email))
+                .thenReturn(List.of(expA, expB, expC));
+
+        // Act
+        CompletableFuture<List<ExpenseResponseDTO>> future =
+                expenseService.getAllExpensesByUser(email, "amount", "desc", "description", "coffee");
+
+        List<ExpenseResponseDTO> results = future.get();
+
+        // Assert
+        assertEquals(2, results.size());
+        assertEquals(BigDecimal.valueOf(20), results.get(0).getAmount());
+        assertEquals("Coffee beans", results.get(0).getDescription());
+        assertEquals(BigDecimal.valueOf(10), results.get(1).getAmount());
+        assertEquals("Coffee", results.get(1).getDescription());
     }
 }

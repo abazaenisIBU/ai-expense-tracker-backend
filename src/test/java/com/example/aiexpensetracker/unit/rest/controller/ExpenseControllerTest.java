@@ -1,7 +1,8 @@
-package com.example.aiexpensetracker.rest.controller;
+package com.example.aiexpensetracker.unit.rest.controller;
 
 import com.example.aiexpensetracker.core.service.manager.ServiceManager;
 import com.example.aiexpensetracker.core.service.expense.ExpenseService;
+import com.example.aiexpensetracker.rest.controller.ExpenseController;
 import com.example.aiexpensetracker.rest.dto.expense.CreateExpenseDTO;
 import com.example.aiexpensetracker.rest.dto.expense.ExpenseResponseDTO;
 import com.example.aiexpensetracker.rest.dto.expense.UpdateExpenseDTO;

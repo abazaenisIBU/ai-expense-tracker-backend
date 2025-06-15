@@ -1,4 +1,4 @@
-package com.example.aiexpensetracker.core.repository;
+package com.example.aiexpensetracker.unit.core.repository;
 
 import com.example.aiexpensetracker.core.model.Category;
 import com.example.aiexpensetracker.core.model.User;
